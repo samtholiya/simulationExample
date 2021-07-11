@@ -1,0 +1,25 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./data/dev/mongo:/d/data/db
+
+  api:
+    build: .
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+    depends_on:
+      - mongo
+    env_file:
+      - .env
