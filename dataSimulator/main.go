@@ -19,18 +19,18 @@ import (
 
 func main() {
 	numberOfCars := flag.Int("number", 21, "Number of simulators")
-
+	hostURL := flag.String("server", "http://localhost:8080", "Server url")
 	flag.Parse()
-	hostURL := os.Getenv("SERVER_URL")
-	if hostURL == "" {
-		hostURL = "http://localhost:8080"
+	envHostURL := os.Getenv("SERVER_URL")
+	if envHostURL != "" {
+		*hostURL = envHostURL
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 	wg.Add(*numberOfCars)
 	for i := 0; i < *numberOfCars; i++ {
 		simulator := vehicle.NewSimulator(fmt.Sprintf("simulated_%v", i), 52.20472+float64(i), 0.14056, 15+float64(i))
-		go CarRunner(ctx, wg, hostURL, simulator)
+		go CarRunner(ctx, wg, *hostURL, simulator)
 	}
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
